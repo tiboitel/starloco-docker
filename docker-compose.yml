@@ -1,0 +1,131 @@
+secrets:
+  mariadb_root_secret:
+    file: ./secrets/mariadb_root.secret
+  starloco_db_password_secret:
+    file: ./secrets/starloco_db_password.secret
+  exchange_key_secret:
+    file: ./secrets/exchange_key.secret
+
+networks:
+  starloco:
+    driver: bridge
+
+services:
+  mariadb:
+    image: mariadb:11.3
+    container_name: mariadb
+    restart: unless-stopped
+    networks:
+      - starloco
+    secrets:
+      - mariadb_root_secret
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
+      MARIADB_DATABASE: starloco_login
+      MARIADB_USER: ${STARLOCO_DB_USER:-starloco}
+    command: --skip-ssl --bind-address=0.0.0.0
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./mariadb-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    networks:
+      - starloco
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:6379:6379"
+    environment:
+      REDIS_ARG: "--save 60 1000 --appendonly yes"
+    volumes:
+      - redis_data:/data
+
+  login:
+    build:
+      context: ./login
+      dockerfile: Dockerfile
+    container_name: login
+    restart: unless-stopped
+    networks:
+      - starloco
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:450:450"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    secrets:
+      - starloco_db_password_secret
+      - exchange_key_secret
+    environment:
+      JAVA_OPTS: "-Xms256m -Xmx512m -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.keyStoreType=JKS -DmariaDB=true"
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
+      MARIADB_HOST: mariadb
+      STARLOCO_DB_USER: ${STARLOCO_DB_USER:-starloco}
+      STARLOCO_DB_PASSWORD_FILE: /run/secrets/starloco_db_password_secret
+      GAME_SERVER_IP: ${GAME_SERVER_IP:-127.0.0.1}
+      GAME_SERVER_ID: ${GAME_SERVER_ID:-601}
+      GAME_SERVER_KEY: ${GAME_SERVER_KEY:-shogun}
+      GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
+      EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
+
+  game:
+    image: starloco_game:latest
+    container_name: game
+    restart: unless-stopped
+    networks:
+      - starloco
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:5555:5555"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    secrets:
+      - starloco_db_password_secret
+      - exchange_key_secret
+    environment:
+      JAVA_OPTS: "-Xms512m -Xmx1024m -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.keyStoreType=JKS -DmariaDB=true"
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
+      MARIADB_HOST: mariadb
+      STARLOCO_DB_USER: ${STARLOCO_DB_USER:-starloco}
+      STARLOCO_DB_PASSWORD_FILE: /run/secrets/starloco_db_password_secret
+      GAME_SERVER_IP: ${GAME_SERVER_IP:-127.0.0.1}
+      GAME_SERVER_ID: ${GAME_SERVER_ID:-601}
+      GAME_SERVER_KEY: ${GAME_SERVER_KEY:-shogun}
+      GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
+      EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
+      RATE_XP: ${RATE_XP:-1}
+      RATE_DROP: ${RATE_DROP:-1}
+      RATE_DROP_THRESHOLD: ${RATE_DROP_THRESHOLD:-1}
+      RATE_JOB: ${RATE_JOB:-1}
+      RATE_FM: ${RATE_FM:-1}
+      RATE_HONOR: ${RATE_HONOR:-1}
+      RATE_KAMAS: ${RATE_KAMAS:-1}
+      STARLOCO_CONFIG_PATH: /app/config/game.config.properties
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: web
+    restart: unless-stopped
+    networks:
+      - starloco
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:80:80"
+    depends_on:
+      - mariadb
+    volumes:
+      - ./web:/var/www:rw
+      - ./web/nginx.conf:/etc/nginx/nginx.conf
+
+volumes:
+  mariadb_data:
+  redis_data:
