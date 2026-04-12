@@ -107,47 +107,6 @@ download_sql() {
     echo "  SQL download complete!"
 }
 
-import_sql_databases() {
-    echo "Importing SQL databases..."
-    
-    DB_USER="${STARLOCO_DB_USER:-starloco}"
-    DB_PASSWORD="${STARLOCO_DB_PASSWORD}"
-    ROOT_PASSWORD="${MARIADB_ROOT_PASSWORD}"
-    
-    if [ -f "mariadb-init/02-login.sql" ]; then
-        echo "  Importing 02-login.sql to starloco_login..."
-        mysql -h127.0.0.1 -uroot -p"$ROOT_PASSWORD" starloco_login < mariadb-init/02-login.sql 2>/dev/null || \
-            echo "  WARNING: Could not import 02-login.sql"
-    fi
-    
-    if [ -f "mariadb-init/04-game.sql" ]; then
-        echo "  Importing 04-game.sql to starloco_game..."
-        mysql -h127.0.0.1 -uroot -p"$ROOT_PASSWORD" starloco_game < mariadb-init/04-game.sql 2>/dev/null || \
-            echo "  WARNING: Could not import 04-game.sql"
-    fi
-    
-    echo "  Applying game patches..."
-    PATCHES=(
-        "05-update_game_16.04.23.sql"
-        "06-update_game_23.04.23.sql"
-        "07-update_game_24.04.23.sql"
-        "08-update_game_08.05.23.sql"
-        "09-update_game_10.03.2024.sql"
-    )
-    
-    for patch in "${PATCHES[@]}"; do
-        if [ -f "mariadb-init/$patch" ]; then
-            echo "    Applying $patch..."
-            mysql -h127.0.0.1 -uroot -p"$ROOT_PASSWORD" starloco_game < mariadb-init/$patch 2>/dev/null || \
-                echo "    WARNING: Could not apply $patch"
-        fi
-    done
-    
-    echo "  SQL databases imported!"
-}
-
-import_sql_database 
-
 start_services() {
     echo "Starting services..."
     $COMPOSE_CMD up -d --build
