@@ -30,6 +30,10 @@ Edit files in `secrets/`:
 | `mariadb_root.secret` | Database root password |
 | `starloco_db_password.secret` | Game database user password |
 | `exchange_key.secret` | Server exchange key |
+| `mariadb_ca.secret` | TLS CA certificate (auto-generated) |
+| `mariadb_server.secret` | TLS server certificate (auto-generated) |
+| `mariadb_server_key.secret` | TLS server key (auto-generated) |
+| `truststore_password.secret` | Java truststore password (auto-generated) |
 
 Default values are provided for testing. Change them for production.
 
@@ -41,6 +45,21 @@ If you see `$` at the end of the line, remove it with:
 ```bash
 sed -i 's/\r$//' secrets/*.secret
 ```
+
+### TLS Certificates
+
+TLS certificates are auto-generated for secure MariaDB connections. To regenerate:
+
+```bash
+./scripts/generate-certs.sh
+```
+
+This creates:
+- CA certificate (valid 10 years)
+- Server certificate (valid 1 year)
+- Truststore password
+
+Commit the generated certificates to secrets/ and update .gitignore if needed.
 
 ### Environment
 
@@ -60,6 +79,7 @@ Edit `.env` for custom settings:
 | `RATE_JOB` | `1` | Job skill multiplier |
 | `RATE_FM` | `1` | Smithmagic (crafting) multiplier |
 | `RATE_HONOR` | `1` | Honor/PvP multiplier |
+| `GAME_SERVER_DEBUG` | `false` | Enable debug mode for troubleshooting |
 
 ## Commands
 
@@ -85,10 +105,12 @@ Production mode includes:
 
 | Feature | Description |
 |---------|-------------|
+| TLS encryption | SSL/TLS for MariaDB connections |
 | Resource limits | CPU and memory limits per service |
 | Health checks | Service health monitoring |
 | Log rotation | Logs limited to 10MB per file, 3 files max |
 | Restart policies | Auto-restart on failure |
+| Non-root users | Containers run as non-root (UID 1000) |
 
 ```bash
 ./run.sh start --prod
