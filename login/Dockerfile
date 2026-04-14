@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk add --no-cache bash curl
+RUN apk add --no-cache bash curl netcat-openbsd
 
 WORKDIR /app
 

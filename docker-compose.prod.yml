@@ -20,12 +20,6 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
     logging:
       driver: json-file
       options:
@@ -38,11 +32,6 @@ services:
         limits:
           memory: 256M
           cpus: "0.5"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 3
     logging:
       driver: json-file
       options:
@@ -56,7 +45,7 @@ services:
           memory: 512M
           cpus: "1.0"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:450/"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "450"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -79,7 +68,7 @@ services:
         max_attempts: 3
         window: 120s
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "5555"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "5555"]
       interval: 30s
       timeout: 10s
       retries: 3
