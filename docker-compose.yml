@@ -46,6 +46,11 @@ services:
       REDIS_ARG: "--save 60 1000 --appendonly yes"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   login:
     build:
@@ -74,6 +79,12 @@ services:
       GAME_SERVER_KEY: ${GAME_SERVER_KEY:-shogun}
       GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
       EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "450"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   game:
     build:
@@ -89,7 +100,7 @@ services:
       mariadb:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     secrets:
       - starloco_db_password_secret
       - exchange_key_secret
@@ -127,8 +138,8 @@ services:
     depends_on:
       - mariadb
     volumes:
-      - ./web:/var/www:rw
-      - ./web/nginx.conf:/etc/nginx/nginx.conf
+      - ./web:/var/www:ro
+      - ./web/nginx.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   mariadb_data:
