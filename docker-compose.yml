@@ -76,7 +76,9 @@ services:
       EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
 
   game:
-    image: starloco_game:latest
+    build:
+      context: ./game
+      dockerfile: Dockerfile
     container_name: game
     restart: unless-stopped
     networks:
