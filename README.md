@@ -33,59 +33,117 @@ Edit files in `secrets/`:
 
 Default values are provided for testing. Change them for production.
 
+**Note:** Secrets files must not have trailing newlines. To check:
+```bash
+cat -A secrets/mariadb_root.secret
+```
+If you see `$` at the end of the line, remove it with:
+```bash
+sed -i 's/\r$//' secrets/*.secret
+```
+
 ### Environment
 
-Edit `.env` for custom settings (optional):
+Edit `.env` for custom settings:
 
-```bash
-BIND_ADDRESS=0.0.0.0
-GAME_SERVER_IP=127.0.0.1
-GAME_SERVER_ID=601
-GAME_SERVER_KEY=shogun
-GAME_SERVER_VERSION=1.39.8
-RATE_XP=1
-RATE_DROP=1
-RATE_KAMAS=1
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BIND_ADDRESS` | `0.0.0.0` | Listen address (use `127.0.0.1` for localhost only) |
+| `GAME_SERVER_IP` | `127.0.0.1` | Public IP players connect to |
+| `GAME_SERVER_ID` | `601` | Server identifier |
+| `GAME_SERVER_KEY` | `shogun` | Server authentication key |
+| `GAME_SERVER_VERSION` | `1.39.8` | Dofus client version |
+| `RATE_XP` | `1` | Experience multiplier |
+| `RATE_DROP` | `1` | Drop rate multiplier |
+| `RATE_DROP_THRESHOLD` | `1` | Drop threshold multiplier |
+| `RATE_KAMAS` | `1` | Kamas (currency) multiplier |
+| `RATE_JOB` | `1` | Job skill multiplier |
+| `RATE_FM` | `1` | Smithmagic (crafting) multiplier |
+| `RATE_HONOR` | `1` | Honor/PvP multiplier |
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `./run.sh start` | Start all services |
+| `./run.sh start` | Start all services (default) |
 | `./run.sh start --prod` | Start with production config |
-| `./run.sh stop` | Stop services |
-| `./run.sh restart` | Restart services |
-| `./run.sh logs` | View logs |
+| `./run.sh start --build` | Start with image rebuild |
+| `./run.sh stop` | Stop all services |
+| `./run.sh restart` | Restart all services |
+| `./run.sh restart --prod` | Restart with production config |
+| `./run.sh logs` | View all logs |
 | `./run.sh logs [service]` | View specific service logs |
-| `./run.sh status` | Show status |
+| `./run.sh status` | Show service status |
 | `./run.sh backup` | Backup data to `backups/` |
 | `./run.sh restore` | Restore from backup |
 | `./run.sh clean` | Delete all data |
+| `./run.sh help` | Show help |
 
 ## Production Mode
 
 Production mode includes:
-- Resource limits (CPU/memory)
-- Health checks
-- Log rotation
-- Restart policies
+
+| Feature | Description |
+|---------|-------------|
+| Resource limits | CPU and memory limits per service |
+| Health checks | Service health monitoring |
+| Log rotation | Logs limited to 10MB per file, 3 files max |
+| Restart policies | Auto-restart on failure |
 
 ```bash
 ./run.sh start --prod
 ```
 
+### Resource Limits (Production)
+
+| Service | Memory | CPU |
+|---------|--------|-----|
+| mariadb | 512MB | 1.0 |
+| redis | 256MB | 0.5 |
+| login | 512MB | 1.0 |
+| game | 1024MB | 2.0 |
+| web | 128MB | 0.5 |
+
 ## Troubleshooting
 
 ### Services won't start
+
 ```bash
 ./run.sh logs
 ```
 
 ### Database connection errors
-Check secrets files are correctly formatted (no trailing newlines).
+
+Check secrets files are correctly formatted (no trailing newlines):
+```bash
+sed -i 's/\r$//' secrets/*.secret
+```
+
+### Client connection refused
+
+1. Check firewall/port forwarding
+2. Verify `BIND_ADDRESS` in `.env` (use `0.0.0.0` for LAN/internet)
+3. Ensure services are running: `./run.sh status`
+
+### Images fail to build
+
+Force rebuild with the `--build` flag:
+```bash
+./run.sh start --build
+```
+
+### View specific service logs
+
+```bash
+./run.sh logs game
+./run.sh logs login
+./run.sh logs mariadb
+./run.sh logs redis
+./run.sh logs web
+```
 
 ### Reset everything
+
 ```bash
 ./run.sh clean
 ```
@@ -93,16 +151,24 @@ Check secrets files are correctly formatted (no trailing newlines).
 ## Backup & Restore
 
 ### Backup
+
 ```bash
 ./run.sh backup
 ```
+
 Creates `backups/backup-YYYYMMDD-HHMMSS.tar.gz`
 
+**Tip:** Backups include MariaDB and Redis data volumes.
+
 ### Restore
+
 ```bash
 ./run.sh restore
 ```
+
 Lists available backups and restores selected one.
+
+**Warning:** Restore will stop all services and overwrite existing data.
 
 ## License
 
