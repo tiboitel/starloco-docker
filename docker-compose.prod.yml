@@ -50,7 +50,6 @@ services:
         max-file: "3"
 
   login:
-    image: starloco-docker-login:prod
     deploy:
       resources:
         limits:
@@ -92,7 +91,6 @@ services:
         max-file: "3"
 
   web:
-    image: starloco-docker-web:prod
     deploy:
       resources:
         limits:

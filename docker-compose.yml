@@ -86,6 +86,8 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
+      redis:
+        condition: service_started
     secrets:
       - starloco_db_password_secret
       - exchange_key_secret

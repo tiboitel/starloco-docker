@@ -106,12 +106,78 @@ show_help() {
     echo "  restart     Restart all services"
     echo "  logs        Show logs"
     echo "  status      Show service status"
+    echo "  backup      Backup data to backups/"
+    echo "  restore     Restore data from backup"
     echo "  clean       Stop and remove all containers and volumes"
     echo "  help        Show this help message"
     echo ""
     echo "Options:"
     echo "  --prod      Use production compose file"
     echo "  --dev       Use development compose file (default)"
+}
+
+backup_data() {
+    check_dependencies
+    mkdir -p backups
+    
+    TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+    BACKUP_FILE="backups/backup-${TIMESTAMP}.tar.gz"
+    
+    echo "Creating backup: $BACKUP_FILE"
+    
+    $COMPOSE_CMD -f docker-compose.yml down
+    
+    docker run --rm \
+        -v starloco-docker_mariadb_data:/data/mariadb \
+        -v starloco-docker_redis_data:/data/redis \
+        -v "$PWD/backups":/backup \
+        alpine tar czf "/backup/backup-${TIMESTAMP}.tar.gz" -C /data .
+    
+    $COMPOSE_CMD -f docker-compose.yml up -d
+    
+    echo "Backup created: $BACKUP_FILE"
+}
+
+restore_data() {
+    check_dependencies
+    
+    if [ ! -d "backups" ] || [ -z "$(ls -A backups/*.tar.gz 2>/dev/null)" ]; then
+        echo "No backups found in backups/ directory."
+        exit 1
+    fi
+    
+    echo "Available backups:"
+    ls -lh backups/*.tar.gz
+    
+    echo ""
+    read -p "Enter backup filename to restore: " BACKUP_FILE
+    
+    if [ ! -f "backups/$BACKUP_FILE" ]; then
+        echo "Backup file not found: $BACKUP_FILE"
+        exit 1
+    fi
+    
+    echo "WARNING: This will STOP services and OVERWRITE all data!"
+    read -p "Are you sure? (yes/no): " confirm
+    if [ "$confirm" != "yes" ]; then
+        echo "Restore cancelled."
+        exit 0
+    fi
+    
+    echo "Stopping services..."
+    $COMPOSE_CMD -f docker-compose.yml down
+    
+    echo "Restoring from: $BACKUP_FILE"
+    docker run --rm \
+        -v starloco-docker_mariadb_data:/data/mariadb \
+        -v starloco-docker_redis_data:/data/redis \
+        -v "$PWD/backups":/backup \
+        alpine tar xzf "/backup/$BACKUP_FILE" -C /data
+    
+    echo "Starting services..."
+    $COMPOSE_CMD -f docker-compose.yml up -d
+    
+    echo "Restore complete."
 }
 
 case "${1:-start}" in
@@ -149,6 +215,12 @@ case "${1:-start}" in
             $COMPOSE_CMD -f docker-compose.yml down -v --remove-orphans
             echo "All data deleted."
         fi
+        ;;
+    backup)
+        backup_data
+        ;;
+    restore)
+        restore_data
         ;;
     help|--help|-h)
         show_help
