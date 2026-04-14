@@ -27,25 +27,9 @@ read_secrets
 
 COMPOSE_CMD=""
 COMPOSE_FILES="-f docker-compose.yml"
-PROD_MODE=false
 
-# Parse arguments for --prod flag
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --prod)
-            PROD_MODE=true
-            COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.prod.yml"
-            shift
-            ;;
-        --dev)
-            PROD_MODE=false
-            shift
-            ;;
-        *)
-            shift
-            ;;
-    esac
-done
+# Parse command first
+CMD="${1:-start}"
 
 check_dependencies() {
     echo "Checking dependencies..."
@@ -68,16 +52,39 @@ check_dependencies() {
     echo "  Docker Compose: $COMPOSE_CMD"
 }
 
+parse_flags() {
+    # Parse remaining arguments for --prod/--dev flags
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --prod)
+                COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.prod.yml"
+                shift
+                ;;
+            --dev)
+                COMPOSE_FILES="-f docker-compose.yml"
+                shift
+                ;;
+            --build)
+                BUILD_FLAG="--build"
+                shift
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+}
+
 start_services() {
     echo "Starting services..."
-    $COMPOSE_CMD $COMPOSE_FILES up -d --build
+    $COMPOSE_CMD $COMPOSE_FILES up -d ${BUILD_FLAG:-}
     
     echo ""
     echo "Waiting for services to start..."
     sleep 5
     
     echo ""
-    $COMPOSE_CMD -f docker-compose.yml ps
+    $COMPOSE_CMD $COMPOSE_FILES ps
 }
 
 show_logs() {
@@ -97,7 +104,7 @@ show_logs() {
 }
 
 show_help() {
-    echo "Usage: $0 [command] [--prod|--dev]"
+    echo "Usage: $0 [command] [--prod|--dev] [--build]"
     echo ""
     echo "Commands:"
     echo "  start       Start all services (default)"
@@ -105,6 +112,7 @@ show_help() {
     echo "  stop        Stop all services"
     echo "  restart     Restart all services"
     echo "  logs        Show logs"
+    echo "  logs [service]  Show specific service logs"
     echo "  status      Show service status"
     echo "  backup      Backup data to backups/"
     echo "  restore     Restore data from backup"
@@ -114,6 +122,7 @@ show_help() {
     echo "Options:"
     echo "  --prod      Use production compose file"
     echo "  --dev       Use development compose file (default)"
+    echo "  --build     Force image rebuild (start/restart)"
 }
 
 backup_data() {
@@ -125,7 +134,7 @@ backup_data() {
     
     echo "Creating backup: $BACKUP_FILE"
     
-    $COMPOSE_CMD -f docker-compose.yml down
+    $COMPOSE_CMD $COMPOSE_FILES down
     
     docker run --rm \
         -v starloco-docker_mariadb_data:/data/mariadb \
@@ -133,7 +142,7 @@ backup_data() {
         -v "$PWD/backups":/backup \
         alpine tar czf "/backup/backup-${TIMESTAMP}.tar.gz" -C /data .
     
-    $COMPOSE_CMD -f docker-compose.yml up -d
+    $COMPOSE_CMD $COMPOSE_FILES up -d
     
     echo "Backup created: $BACKUP_FILE"
 }
@@ -165,7 +174,7 @@ restore_data() {
     fi
     
     echo "Stopping services..."
-    $COMPOSE_CMD -f docker-compose.yml down
+    $COMPOSE_CMD $COMPOSE_FILES down
     
     echo "Restoring from: $BACKUP_FILE"
     docker run --rm \
@@ -175,58 +184,74 @@ restore_data() {
         alpine tar xzf "/backup/$BACKUP_FILE" -C /data
     
     echo "Starting services..."
-    $COMPOSE_CMD -f docker-compose.yml up -d
+    $COMPOSE_CMD $COMPOSE_FILES up -d
     
     echo "Restore complete."
 }
 
-case "${1:-start}" in
+case "$CMD" in
     start)
+        shift
+        parse_flags "$@"
         check_dependencies
         start_services
         show_logs
         ;;
     stop)
+        shift
+        parse_flags "$@"
         check_dependencies
         echo "Stopping services..."
         $COMPOSE_CMD $COMPOSE_FILES down --remove-orphans
         echo "Services stopped."
         ;;
     restart)
+        shift
+        parse_flags "$@"
         check_dependencies
         echo "Restarting services..."
         $COMPOSE_CMD $COMPOSE_FILES down --remove-orphans
-        $COMPOSE_CMD $COMPOSE_FILES up -d --build
-        $COMPOSE_CMD -f docker-compose.yml ps
+        $COMPOSE_CMD $COMPOSE_FILES up -d ${BUILD_FLAG:-}
+        $COMPOSE_CMD $COMPOSE_FILES ps
         ;;
     logs)
+        shift
+        SERVICE="${1:-}"
         check_dependencies
-        $COMPOSE_CMD $COMPOSE_FILES logs -f --tail=100 "${2:-}"
+        $COMPOSE_CMD $COMPOSE_FILES logs -f --tail=100 "$SERVICE"
         ;;
     status)
+        shift
+        parse_flags "$@"
         check_dependencies
-        $COMPOSE_CMD -f docker-compose.yml ps -a
+        $COMPOSE_CMD $COMPOSE_FILES ps -a
         ;;
     clean)
+        shift
+        parse_flags "$@"
         check_dependencies
         echo "WARNING: This will delete all data!"
         read -p "Are you sure? (yes/no): " confirm
         if [ "$confirm" = "yes" ]; then
-            $COMPOSE_CMD -f docker-compose.yml down -v --remove-orphans
+            $COMPOSE_CMD $COMPOSE_FILES down -v --remove-orphans
             echo "All data deleted."
         fi
         ;;
     backup)
+        shift
+        parse_flags "$@"
         backup_data
         ;;
     restore)
+        shift
+        parse_flags "$@"
         restore_data
         ;;
     help|--help|-h)
         show_help
         ;;
     *)
-        echo "Unknown command: $1"
+        echo "Unknown command: $CMD"
         show_help
         exit 1
         ;;
