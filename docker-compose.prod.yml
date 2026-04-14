@@ -32,11 +32,6 @@ services:
         limits:
           memory: 256M
           cpus: "0.5"
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
     logging:
       driver: json-file
       options:
@@ -50,7 +45,7 @@ services:
           memory: 512M
           cpus: "1.0"
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "450"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "450"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -73,7 +68,7 @@ services:
         max_attempts: 3
         window: 120s
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "5555"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "5555"]
       interval: 30s
       timeout: 10s
       retries: 3

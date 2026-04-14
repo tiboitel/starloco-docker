@@ -80,7 +80,7 @@ services:
       GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
       EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
     healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "450"]
+      test: ["CMD", "nc", "-z", "127.0.0.1", "450"]
       interval: 30s
       timeout: 10s
       retries: 3
