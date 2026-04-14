@@ -16,16 +16,36 @@ fi
 # Read secrets for script operations
 read_secrets() {
     if [ -f "secrets/mariadb_root.secret" ]; then
-        export MARIADB_ROOT_PASSWORD=$(cat secrets/mariadb_root.secret)
+        export MARIADB_ROOT_PASSWORD=$(tr -d '\r\n' < secrets/mariadb_root.secret)
     fi
     if [ -f "secrets/starloco_db_password.secret" ]; then
-        export STARLOCO_DB_PASSWORD=$(cat secrets/starloco_db_password.secret)
+        export STARLOCO_DB_PASSWORD=$(tr -d '\r\n' < secrets/starloco_db_password.secret)
     fi
 }
 
 read_secrets
 
 COMPOSE_CMD=""
+COMPOSE_FILES="-f docker-compose.yml"
+PROD_MODE=false
+
+# Parse arguments for --prod flag
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --prod)
+            PROD_MODE=true
+            COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.prod.yml"
+            shift
+            ;;
+        --dev)
+            PROD_MODE=false
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
 
 check_dependencies() {
     echo "Checking dependencies..."
@@ -48,75 +68,16 @@ check_dependencies() {
     echo "  Docker Compose: $COMPOSE_CMD"
 }
 
-download_sql() {
-    echo "Downloading SQL databases..."
-    
-    mkdir -p mariadb-init
-    
-    REQUIRED_FILES=(
-        "02-login.sql"
-        "04-game.sql"
-        "05-update_game_16.04.23.sql"
-        "06-update_game_23.04.23.sql"
-        "07-update_game_24.04.23.sql"
-        "08-update_game_08.05.23.sql"
-        "09-update_game_10.03.2024.sql"
-    )
-    
-    all_exist=true
-    for file in "${REQUIRED_FILES[@]}"; do
-        if [ ! -f "mariadb-init/$file" ]; then
-            all_exist=false
-            break
-        fi
-    done
-    
-    if [ "$all_exist" = true ]; then
-        echo "  SQL files already exist, skipping download."
-        return
-    fi
-    
-    if ! command -v curl &> /dev/null; then
-        echo "  curl not found. Please download SQL files manually."
-        return
-    fi
-    
-    BASE_URL="https://raw.githubusercontent.com/StarLoco/StarLoco/main/docker/db-init"
-    
-    echo "Downloading 02-login.sql..."
-    curl -L -o mariadb-init/02-login.sql "${BASE_URL}/02-login.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "Downloading 04-game.sql..."
-    curl -L -o mariadb-init/04-game.sql "${BASE_URL}/04-game.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "Downloading 05-update_game_16.04.23.sql..."
-    curl -L -o mariadb-init/05-update_game_16.04.23.sql "${BASE_URL}/05-update_game_16.04.23.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "Downloading 06-update_game_23.04.23.sql..."
-    curl -L -o mariadb-init/06-update_game_23.04.23.sql "${BASE_URL}/06-update_game_23.04.23.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "Downloading 07-update_game_24.04.23.sql..."
-    curl -L -o mariadb-init/07-update_game_24.04.23.sql "${BASE_URL}/07-update_game_24.04.23.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "Downloading 08-update_game_08.05.23.sql..."
-    curl -L -o mariadb-init/08-update_game_08.05.23.sql "${BASE_URL}/08-update_game_08.05.23.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "Downloading 09-update_game_10.03.2024.sql..."
-    curl -L -o mariadb-init/09-update_game_10.03.2024.sql "${BASE_URL}/09-update_game_10.03.2024.sql" 2>/dev/null || echo "  Failed"
-    
-    echo "  SQL download complete!"
-}
-
 start_services() {
     echo "Starting services..."
-    $COMPOSE_CMD up -d --build
+    $COMPOSE_CMD $COMPOSE_FILES up -d --build
     
     echo ""
     echo "Waiting for services to start..."
     sleep 5
     
     echo ""
-    $COMPOSE_CMD ps
+    $COMPOSE_CMD -f docker-compose.yml ps
 }
 
 show_logs() {
@@ -136,52 +97,56 @@ show_logs() {
 }
 
 show_help() {
-    echo "Usage: $0 [command]"
+    echo "Usage: $0 [command] [--prod|--dev]"
     echo ""
     echo "Commands:"
     echo "  start       Start all services (default)"
+    echo "  start --prod    Start services with production config"
     echo "  stop        Stop all services"
     echo "  restart     Restart all services"
     echo "  logs        Show logs"
     echo "  status      Show service status"
     echo "  clean       Stop and remove all containers and volumes"
     echo "  help        Show this help message"
+    echo ""
+    echo "Options:"
+    echo "  --prod      Use production compose file"
+    echo "  --dev       Use development compose file (default)"
 }
 
 case "${1:-start}" in
     start)
         check_dependencies
-        download_sql
         start_services
         show_logs
         ;;
     stop)
         check_dependencies
         echo "Stopping services..."
-        $COMPOSE_CMD down --remove-orphans
+        $COMPOSE_CMD $COMPOSE_FILES down --remove-orphans
         echo "Services stopped."
         ;;
     restart)
         check_dependencies
         echo "Restarting services..."
-        $COMPOSE_CMD down --remove-orphans
-        $COMPOSE_CMD up -d --build
-        $COMPOSE_CMD ps
+        $COMPOSE_CMD $COMPOSE_FILES down --remove-orphans
+        $COMPOSE_CMD $COMPOSE_FILES up -d --build
+        $COMPOSE_CMD -f docker-compose.yml ps
         ;;
     logs)
         check_dependencies
-        $COMPOSE_CMD logs -f --tail=100 "${2:-}"
+        $COMPOSE_CMD $COMPOSE_FILES logs -f --tail=100 "${2:-}"
         ;;
     status)
         check_dependencies
-        $COMPOSE_CMD ps -a
+        $COMPOSE_CMD -f docker-compose.yml ps -a
         ;;
     clean)
         check_dependencies
         echo "WARNING: This will delete all data!"
         read -p "Are you sure? (yes/no): " confirm
         if [ "$confirm" = "yes" ]; then
-            $COMPOSE_CMD down -v --remove-orphans
+            $COMPOSE_CMD -f docker-compose.yml down -v --remove-orphans
             echo "All data deleted."
         fi
         ;;

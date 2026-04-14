@@ -4,4 +4,4 @@
 USE starloco_login;
 
 -- Fix server 601 key and name
-UPDATE world_servers SET `key` = 'shogun', name = 'Shogun Gauntlet' WHERE id = 601;
+UPDATE world_servers SET `key` = 'valem', name = 'Valem' WHERE id = 601;

@@ -6,9 +6,9 @@ WORKDIR /app
 
 RUN mkdir -p config data scripts/data scripts/models
 
-COPY run.sh ./
-RUN chmod +x run.sh
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
 
 EXPOSE 5555 666
 
-ENTRYPOINT ["./run.sh"]
+ENTRYPOINT ["./entrypoint.sh"]

@@ -15,11 +15,11 @@ fi
 # Read secrets from Docker secrets or environment
 read_secrets() {
     if [ -f "/run/secrets/starloco_db_password_secret" ]; then
-        STARLOCO_DB_PASSWORD=$(cat /run/secrets/starloco_db_password_secret)
+        STARLOCO_DB_PASSWORD=$(tr -d '\r\n' < /run/secrets/starloco_db_password_secret)
     fi
     
     if [ -f "/run/secrets/exchange_key_secret" ]; then
-        EXCHANGE_KEY=$(cat /run/secrets/exchange_key_secret)
+        EXCHANGE_KEY=$(tr -d '\r\n' < /run/secrets/exchange_key_secret)
     fi
 }
 
