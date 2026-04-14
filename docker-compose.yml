@@ -111,6 +111,7 @@ services:
       RATE_FM: ${RATE_FM:-1}
       RATE_HONOR: ${RATE_HONOR:-1}
       RATE_KAMAS: ${RATE_KAMAS:-1}
+      GAME_SERVER_DEBUG: ${GAME_SERVER_DEBUG:-false}
       STARLOCO_CONFIG_PATH: /app/config/game.config.properties
 
   web:

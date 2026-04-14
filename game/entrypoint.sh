@@ -35,8 +35,8 @@ system.server.exchange.ip login
 system.server.exchange.port 666
 system.server.exchange.bind 0.0.0.0
 system.server.exchange.key ${EXCHANGE_KEY}
-system.server.encyption false
-system.server.debug true
+system.server.encryption false
+system.server.debug ${GAME_SERVER_DEBUG:-false}
 system.server.logs true
 
 database.login.host mariadb
