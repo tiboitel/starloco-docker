@@ -5,14 +5,6 @@ secrets:
     file: ./secrets/starloco_db_password.secret
   exchange_key_secret:
     file: ./secrets/exchange_key.secret
-  mariadb_ca_secret:
-    file: ./secrets/mariadb_ca.secret
-  mariadb_server_secret:
-    file: ./secrets/mariadb_server.secret
-  mariadb_server_key_secret:
-    file: ./secrets/mariadb_server_key.secret
-  truststore_password_secret:
-    file: ./secrets/truststore_password.secret
 
 networks:
   starloco:
@@ -30,11 +22,7 @@ services:
       MARIADB_DATABASE: starloco_login
       MARIADB_USER: ${STARLOCO_DB_USER:-starloco}
       MARIADB_PASSWORD: ${STARLOCO_DB_PASSWORD}
-    command: --ssl=1 --ssl-ca=/run/secrets/mariadb_ca_secret --ssl-cert=/run/secrets/mariadb_server_secret --ssl-key=/run/secrets/mariadb_server_key_secret --bind-address=0.0.0.0
-    secrets:
-      - mariadb_ca_secret
-      - mariadb_server_secret
-      - mariadb_server_key_secret
+    command: --bind-address=0.0.0.0
     ports:
       - "${BIND_ADDRESS:-0.0.0.0}:3306:3306"
     volumes:
@@ -75,8 +63,6 @@ services:
     secrets:
       - starloco_db_password_secret
       - exchange_key_secret
-      - mariadb_ca_secret
-      - truststore_password_secret
     environment:
       JAVA_OPTS: "-Xms256m -Xmx512m -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.keyStoreType=JKS -DmariaDB=true"
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
@@ -88,7 +74,6 @@ services:
       GAME_SERVER_KEY: ${GAME_SERVER_KEY:-shogun}
       GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
       EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
-      TRUSTSTORE_PASSWORD_FILE: /run/secrets/truststore_password_secret
 
   game:
     build:
@@ -108,8 +93,6 @@ services:
     secrets:
       - starloco_db_password_secret
       - exchange_key_secret
-      - mariadb_ca_secret
-      - truststore_password_secret
     environment:
       JAVA_OPTS: "-Xms512m -Xmx1024m -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.keyStoreType=JKS -DmariaDB=true"
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
@@ -129,7 +112,6 @@ services:
       RATE_HONOR: ${RATE_HONOR:-1}
       RATE_KAMAS: ${RATE_KAMAS:-1}
       GAME_SERVER_DEBUG: ${GAME_SERVER_DEBUG:-false}
-      TRUSTSTORE_PASSWORD_FILE: /run/secrets/truststore_password_secret
       STARLOCO_CONFIG_PATH: /app/config/game.config.properties
 
   web:
