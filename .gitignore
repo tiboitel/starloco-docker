@@ -1,4 +1,5 @@
 .opencode
+AGENTS.md
 .env
 secrets
 backups
