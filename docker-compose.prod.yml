@@ -86,7 +86,7 @@ services:
           memory: 128M
           cpus: "0.5"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
