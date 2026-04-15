@@ -98,6 +98,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      login:
+        condition: service_healthy
     secrets:
       - starloco_db_password_secret
       - exchange_key_secret
@@ -133,7 +135,14 @@ services:
     ports:
       - "${BIND_ADDRESS:-0.0.0.0}:80:80"
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
+    secrets:
+      - starloco_db_password_secret
+    environment:
+      MARIADB_HOST: mariadb
+      LOGIN_HOST: login
+      GAME_HOST: game
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/healthz"]
       interval: 30s
@@ -141,9 +150,11 @@ services:
       retries: 3
       start_period: 30s
     volumes:
-      - ./web:/var/www:ro
+      - ./web/public:/src/public:ro
+      - web_runtime:/runtime
       - ./web/nginx.conf:/etc/nginx/nginx.conf:ro
 
 volumes:
   mariadb_data:
   redis_data:
+  web_runtime:
