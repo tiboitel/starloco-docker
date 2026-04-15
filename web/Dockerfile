@@ -21,8 +21,17 @@ RUN apk add --no-cache \
 
 RUN mkdir -p /var/www/web /var/www/adminer /var/www/dofus /var/www/data /run/php /var/log/nginx
 
+RUN set -eux; \
+    for conf in /etc/php83/php-fpm.d/www.conf /usr/local/etc/php-fpm.d/www.conf; do \
+        if [ -f "$conf" ]; then \
+            sed -i 's/^user = .*/user = www-data/' "$conf"; \
+            sed -i 's/^group = .*/group = www-data/' "$conf"; \
+        fi; \
+    done
+
 COPY php.ini /usr/local/etc/php/php.ini
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY healthz.html /usr/local/share/nginx/html/healthz.html
 
 RUN chown -R www-data:www-data /var/www
 
