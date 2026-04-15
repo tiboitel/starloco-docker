@@ -1,5 +1,10 @@
 # StarLoco Docker
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/Docker-20.10+-2496ED?style=flat&logo=docker)](https://www.docker.com/)
+[![Stars](https://img.shields.io/github/stars/tiboitel/starloco-docker)](https://github.com/tiboitel/starloco-docker)
+[![Last commit](https://img.shields.io/github/last-commit/tiboitel/starloco-docker)](https://github.com/tiboitel/starloco-docker)
+
 Dofus Retro private server - one command deployment.
 
 ## Prerequisites
