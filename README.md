@@ -96,6 +96,7 @@ Production mode includes:
 **Note:** TLS for MariaDB is not yet supported (known upstream issue).
 
 `GAME_SERVER_KEY` and `GAME_SERVER_NAME` are synced into `world_servers` on game startup, so `.env` is the only file you need to edit for server identity changes.
+The game service also waits for the login service to become healthy before starting its own exchange connection.
 
 ```bash
 ./run.sh start --prod

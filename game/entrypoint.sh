@@ -35,7 +35,7 @@ update_world_server() {
     SAFE_GAME_SERVER_KEY=${GAME_SERVER_KEY:-starloco}
     SAFE_GAME_SERVER_KEY=${SAFE_GAME_SERVER_KEY//\'/\'\'}
     SAFE_GAME_SERVER_NAME=${GAME_SERVER_NAME//\'/\'\'}
-    mysql -h "${MARIADB_HOST:-mariadb}" \
+    mariadb --skip-ssl -h "${MARIADB_HOST:-mariadb}" \
         -u "${STARLOCO_DB_USER:-starloco}" \
         -p"${STARLOCO_DB_PASSWORD}" \
         starloco_login \

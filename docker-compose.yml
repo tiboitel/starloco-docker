@@ -98,6 +98,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      login:
+        condition: service_healthy
     secrets:
       - starloco_db_password_secret
       - exchange_key_secret
