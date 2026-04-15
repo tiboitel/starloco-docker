@@ -1,6 +1,4 @@
 secrets:
-  mariadb_root_secret:
-    file: ./secrets/mariadb_root.secret
   starloco_db_password_secret:
     file: ./secrets/starloco_db_password.secret
   exchange_key_secret:
@@ -70,7 +68,6 @@ services:
       - exchange_key_secret
     environment:
       JAVA_OPTS: "-Xms256m -Xmx512m -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.keyStoreType=JKS -DmariaDB=true"
-      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
       MARIADB_HOST: mariadb
       STARLOCO_DB_USER: ${STARLOCO_DB_USER:-starloco}
       STARLOCO_DB_PASSWORD_FILE: /run/secrets/starloco_db_password_secret
@@ -106,7 +103,6 @@ services:
       - exchange_key_secret
     environment:
       JAVA_OPTS: "-Xms512m -Xmx1024m -Djavax.net.ssl.trustStoreType=JKS -Djavax.net.ssl.keyStoreType=JKS -DmariaDB=true"
-      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_root_secret
       MARIADB_HOST: mariadb
       STARLOCO_DB_USER: ${STARLOCO_DB_USER:-starloco}
       STARLOCO_DB_PASSWORD_FILE: /run/secrets/starloco_db_password_secret

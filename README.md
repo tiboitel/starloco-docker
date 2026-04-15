@@ -27,7 +27,7 @@ Edit files in `secrets/`:
 
 | File | Description |
 |------|-------------|
-| `mariadb_root.secret` | Database root password |
+| `mariadb_root.secret` | MariaDB root password for maintenance/admin tasks |
 | `starloco_db_password.secret` | Game database user password |
 | `exchange_key.secret` | Server exchange key |
 

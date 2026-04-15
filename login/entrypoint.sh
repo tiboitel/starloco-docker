@@ -21,9 +21,6 @@ read_secrets() {
         EXCHANGE_KEY=$(tr -d '\r\n' < /run/secrets/exchange_key_secret)
     fi
     
-    if [ -f "/run/secrets/mariadb_root_secret" ]; then
-        MARIADB_ROOT_PASSWORD=$(tr -d '\r\n' < /run/secrets/mariadb_root_secret)
-    fi
 }
 
 read_secrets
