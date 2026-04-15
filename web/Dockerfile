@@ -9,6 +9,8 @@ RUN apk add --no-cache \
     php83-session \
     php83-pdo \
     php83-pdo_mysql \
+    php83-pdo_sqlite \
+    php83-sqlite3 \
     php83-mysqli \
     php83-mbstring \
     php83-gd \
@@ -32,9 +34,12 @@ RUN set -eux; \
 COPY php.ini /usr/local/etc/php/php.ini
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY healthz.html /usr/local/share/nginx/html/healthz.html
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
 
 RUN chown -R www-data:www-data /var/www
 
 EXPOSE 80
 
-CMD ["sh", "-c", "php-fpm83 & nginx -g 'daemon off;'"]
+ENTRYPOINT ["/entrypoint.sh"]
