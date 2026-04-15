@@ -25,6 +25,23 @@ read_secrets() {
 
 read_secrets
 
+update_world_server() {
+    if [ -z "${STARLOCO_DB_PASSWORD:-}" ] || [ -z "${GAME_SERVER_NAME:-}" ]; then
+        echo "Warning: Skipping world server update because required values are missing"
+        return 0
+    fi
+
+    echo "Updating world server metadata from environment variables..."
+    SAFE_GAME_SERVER_KEY=${GAME_SERVER_KEY:-starloco}
+    SAFE_GAME_SERVER_KEY=${SAFE_GAME_SERVER_KEY//\'/\'\'}
+    SAFE_GAME_SERVER_NAME=${GAME_SERVER_NAME//\'/\'\'}
+    mysql -h "${MARIADB_HOST:-mariadb}" \
+        -u "${STARLOCO_DB_USER:-starloco}" \
+        -p"${STARLOCO_DB_PASSWORD}" \
+        starloco_login \
+        -e "UPDATE world_servers SET \`key\`='${SAFE_GAME_SERVER_KEY}', name='${SAFE_GAME_SERVER_NAME}' WHERE id=${GAME_SERVER_ID:-601};"
+}
+
 # Generate config from environment variables and secrets
 generate_config() {
     cat > "$CONFIG_FILE" << EOF
@@ -88,6 +105,7 @@ EOF
 
 # Always regenerate config
 generate_config
+update_world_server
 
 if [ ! -f "${SCRIPT_DIR}/Common.lua" ] || [ ! -f "/tmp/scripts_downloaded" ]; then
     echo "Downloading all Lua scripts and maps from GitHub (this may take a while)..."

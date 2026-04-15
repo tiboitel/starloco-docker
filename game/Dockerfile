@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jre-alpine
 
-RUN apk add --no-cache bash curl git netcat-openbsd
+RUN apk add --no-cache bash curl git netcat-openbsd mariadb-client
 
 WORKDIR /app
 

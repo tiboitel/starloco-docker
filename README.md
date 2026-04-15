@@ -51,7 +51,8 @@ Edit `.env` for custom settings:
 | `BIND_ADDRESS` | `0.0.0.0` | Listen address (use `127.0.0.1` for localhost only) |
 | `GAME_SERVER_IP` | `127.0.0.1` | Public IP players connect to |
 | `GAME_SERVER_ID` | `601` | Server identifier |
-| `GAME_SERVER_KEY` | `shogun` | Server authentication key |
+| `GAME_SERVER_KEY` | `YOUR_GAME_SERVER_KEY` | Server authentication key |
+| `GAME_SERVER_NAME` | `YOUR_GAME_SERVER_NAME` | Server display name |
 | `GAME_SERVER_VERSION` | `1.39.8` | Dofus client version |
 | `RATE_XP` | `1` | Experience multiplier |
 | `RATE_DROP` | `1` | Drop rate multiplier |
@@ -72,7 +73,7 @@ Edit `.env` for custom settings:
 | `./run.sh stop` | Stop all services |
 | `./run.sh restart` | Restart all services |
 | `./run.sh restart --prod` | Restart with production config |
-| `./run.sh logs` | View all logs |
+| `./run.sh logs -f` | View all logs |
 | `./run.sh logs [service]` | View specific service logs |
 | `./run.sh status` | Show service status |
 | `./run.sh backup` | Backup data to `backups/` |
@@ -94,6 +95,8 @@ Production mode includes:
 
 **Note:** TLS for MariaDB is not yet supported (known upstream issue).
 
+`GAME_SERVER_KEY` and `GAME_SERVER_NAME` are synced into `world_servers` on game startup, so `.env` is the only file you need to edit for server identity changes.
+
 ```bash
 ./run.sh start --prod
 ```
@@ -113,7 +116,7 @@ Production mode includes:
 ### Services won't start
 
 ```bash
-./run.sh logs
+./run.sh logs -f
 ```
 
 ### Database connection errors

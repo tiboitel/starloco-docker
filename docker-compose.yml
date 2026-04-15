@@ -109,6 +109,7 @@ services:
       GAME_SERVER_IP: ${GAME_SERVER_IP:-127.0.0.1}
       GAME_SERVER_ID: ${GAME_SERVER_ID:-601}
       GAME_SERVER_KEY: ${GAME_SERVER_KEY:-starloco}
+      GAME_SERVER_NAME: ${GAME_SERVER_NAME:-StarLoco}
       GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
       EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
       RATE_XP: ${RATE_XP:-1}
