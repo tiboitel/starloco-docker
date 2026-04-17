@@ -183,6 +183,53 @@ Lists available backups and restores selected one.
 
 **Note:** All artifacts are fetched at build time and baked into the images. No runtime downloads.
 
+## Experimental Fork Support
+
+This feature is **experimental** and provided as-is. Compatibility is not guaranteed.
+
+### Overview
+
+You can override the default StarLoco repositories, refs, and JAR names to use a compatible fork. The Docker build will fetch artifacts from your specified sources.
+
+### Configuration
+
+Add these variables to your `.env` file:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `STARLOCO_GAME_REPO` | `https://github.com/StarLoco/StarLoco-Game.git` | Game server Git repository |
+| `STARLOCO_GAME_REF` | `v1.0.6` | Game server tag/branch/commit |
+| `STARLOCO_GAME_JAR` | `game.jar` | Game server JAR filename |
+| `STARLOCO_LOGIN_REPO` | `https://github.com/StarLoco/StarLoco-Login.git` | Login server Git repository |
+| `STARLOCO_LOGIN_REF` | `v1.0.1` | Login server tag/branch/commit |
+| `STARLOCO_LOGIN_JAR` | `login.jar` | Login server JAR filename |
+
+### Example
+
+```bash
+# Use a custom fork
+STARLOCO_GAME_REPO=https://github.com/myuser/StarLoco-Game.git
+STARLOCO_GAME_REF=my-custom-branch
+STARLOCO_LOGIN_REPO=https://github.com/myuser/StarLoco-Login.git
+STARLOCO_LOGIN_REF=v1.0.2
+```
+
+Then rebuild with:
+```bash
+./run.sh start --build
+```
+
+### Compatibility Requirements
+
+For a fork to work with this stack, it must:
+
+- Use the same database schema as StarLoco
+- Follow the same configuration format and environment variables
+- Expose the same ports (450/666 for login, 5555/666 for game)
+- Include Lua scripts in a `scripts/` directory at the repository root
+
+**No support is provided** for forks that deviate from the StarLoco contract. Use at your own risk.
+
 ## License
 
 MIT License - Modify and distribute as you wish.
