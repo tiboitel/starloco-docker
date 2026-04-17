@@ -177,11 +177,11 @@ Lists available backups and restores selected one.
 
 | Artifact | Source | Integrity |
 |----------|--------|------------|
-| Game server JAR | GitHub releases (StarLoco-Game) | Pinned to v1.0.6 |
-| Login server JAR | GitHub releases (StarLoco-Login) | Pinned to v1.0.1 |
+| Game server JAR | GitHub releases (StarLoco-Game) | Baked at build time (v1.0.6) |
+| Login server JAR | GitHub releases (StarLoco-Login) | Baked at build time (v1.0.1) |
 | Lua scripts | StarLoco-Game scripts/ | Baked at build time (v1.0.6) |
 
-**Note:** Scripts are fetched at build time and baked into the image. No runtime git clone.
+**Note:** All artifacts are fetched at build time and baked into the images. No runtime downloads.
 
 ## License
 
