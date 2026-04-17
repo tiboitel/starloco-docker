@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Setup Docker
+        uses: docker/setup-docker-action@v3
+
+      - name: Validate compose
+        run: docker compose config > /dev/null
+
+      - name: Build login image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./login
+          load: true
+          cache-from: type=gha,scope=login
+          cache-to: type=gha,mode=max,scope=login
+
+      - name: Build game image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./game
+          load: true
+          cache-from: type=gha,scope=game
+          cache-to: type=gha,mode=max,scope=game
+
+      - name: Build web image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web
+          load: true
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
