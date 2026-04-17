@@ -10,13 +10,14 @@ Dofus Retro private server - one command deployment.
 ## Prerequisites
 
 - Docker & Docker Compose
-- Secrets files in `secrets/`
 
 ## Quick Start
 
 ```bash
 ./run.sh start
 ```
+
+Secrets are auto-generated on first launch if missing.
 
 Server available at:
 - Login: `localhost:450`
@@ -28,24 +29,17 @@ Server available at:
 
 ### Secrets
 
-Edit files in `secrets/`:
+On first launch, `./run.sh` auto-generates secrets in `secrets/` if missing:
 
 | File | Description |
 |------|-------------|
-| `mariadb_root.secret` | MariaDB root password for maintenance/admin tasks |
+| `mariadb_root.secret` | MariaDB root password (maintenance) |
 | `starloco_db_password.secret` | Game database user password |
 | `exchange_key.secret` | Server exchange key |
 
-Default values are provided for testing. Change them for production.
+**Important:** Copy `secrets/` to other hosts before starting there.
 
-**Note:** Secrets files must not have trailing newlines. To check:
-```bash
-cat -A secrets/mariadb_root.secret
-```
-If you see `$` at the end of the line, remove it with:
-```bash
-sed -i 's/\r$//' secrets/*.secret
-```
+**Regenerate:** Delete a secret file and restart to generate a new one.
 
 ### Environment
 
@@ -126,13 +120,6 @@ For smaller instances, adjust values down proportionally.
 
 ```bash
 ./run.sh logs -f
-```
-
-### Database connection errors
-
-Check secrets files are correctly formatted (no trailing newlines):
-```bash
-sed -i 's/\r$//' secrets/*.secret
 ```
 
 ### Client connection refused

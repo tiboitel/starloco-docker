@@ -14,6 +14,34 @@ if [ -f ".env" ]; then
 fi
 
 # Read secrets for script operations
+ensure_secrets() {
+    local SECRETS_DIR="$SCRIPT_DIR/secrets"
+    
+    if [ ! -d "$SECRETS_DIR" ]; then
+        echo "Creating secrets directory..."
+        mkdir -p "$SECRETS_DIR" || { echo "Error: Failed to create $SECRETS_DIR" >&2; exit 1; }
+    fi
+    
+    local generated=0
+    for secret_file in starloco_db_password.secret exchange_key.secret mariadb_root.secret; do
+        local secret_path="$SECRETS_DIR/$secret_file"
+        if [ ! -f "$secret_path" ]; then
+            echo "Generating $secret_file..."
+            openssl rand -base64 32 | tr -d '\n' > "$secret_path" || { echo "Error: Failed to generate $secret_file" >&2; exit 1; }
+            chmod 600 "$secret_path" || { echo "Error: Failed to set permissions on $secret_file" >&2; exit 1; }
+            [ -s "$secret_path" ] || { echo "Error: $secret_file is empty" >&2; exit 1; }
+            generated=1
+        fi
+    done
+    
+    if [ $generated -eq 1 ]; then
+        echo "WARNING: New secrets generated. Keep secrets/ directory safe!" >&2
+        echo "On other hosts, copy the secrets/ directory before starting." >&2
+    fi
+}
+
+ensure_secrets
+
 read_secrets() {
     if [ -f "secrets/mariadb_root.secret" ]; then
         export MARIADB_ROOT_PASSWORD=$(tr -d '\r\n' < secrets/mariadb_root.secret)
