@@ -37,7 +37,7 @@ services:
     mem_limit: 768M
     cpus: 0.5
     healthcheck:
-      test: ["CMD", "nc", "-z", "127.0.0.1", "450"]
+      test: ["CMD", "sh", "-c", "nc -z 127.0.0.1 450 && nc -z 127.0.0.1 666"]
       interval: 30s
       timeout: 10s
       retries: 3

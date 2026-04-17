@@ -74,10 +74,11 @@ services:
       GAME_SERVER_IP: ${GAME_SERVER_IP:-127.0.0.1}
       GAME_SERVER_ID: ${GAME_SERVER_ID:-601}
       GAME_SERVER_KEY: ${GAME_SERVER_KEY:-shogun}
+      GAME_SERVER_NAME: ${GAME_SERVER_NAME:-StarLoco}
       GAME_SERVER_VERSION: ${GAME_SERVER_VERSION:-1.39.8}
       EXCHANGE_KEY_FILE: /run/secrets/exchange_key_secret
     healthcheck:
-      test: ["CMD", "nc", "-z", "127.0.0.1", "450"]
+      test: ["CMD", "sh", "-c", "nc -z 127.0.0.1 450 && nc -z 127.0.0.1 666"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -25,6 +25,30 @@ read_secrets() {
 
 read_secrets
 
+update_world_server() {
+    if [ -z "${STARLOCO_DB_PASSWORD:-}" ] || [ -z "${GAME_SERVER_NAME:-}" ]; then
+        echo "Warning: Skipping world server update because required values are missing"
+        return 0
+    fi
+
+    echo "Updating world server metadata from environment variables..."
+    SAFE_GAME_SERVER_KEY=${GAME_SERVER_KEY:-starloco}
+    SAFE_GAME_SERVER_KEY=${SAFE_GAME_SERVER_KEY//\'/\'\'}
+    SAFE_GAME_SERVER_NAME=${GAME_SERVER_NAME:-StarLoco}
+    SAFE_GAME_SERVER_NAME=${SAFE_GAME_SERVER_NAME//\'/\'\'}
+    SAFE_DB_PASSWORD=$(echo "${STARLOCO_DB_PASSWORD}" | sed "s/'/\\\\'/g")
+
+    if mariadb --skip-ssl -h "${MARIADB_HOST:-mariadb}" \
+        -u "${STARLOCO_DB_USER:-starloco}" \
+        -p"${SAFE_DB_PASSWORD}" \
+        starloco_login \
+        -e "UPDATE world_servers SET \`key\`='${SAFE_GAME_SERVER_KEY}', name='${SAFE_GAME_SERVER_NAME}' WHERE id=${GAME_SERVER_ID:-601};"; then
+        echo "World server metadata updated successfully"
+    else
+        echo "Warning: Failed to update world server metadata ( continuing anyway)"
+    fi
+}
+
 # Generate config from environment variables and secrets
 generate_config() {
     cat > "$CONFIG_FILE" << EOF
@@ -56,6 +80,7 @@ EOF
 
 # Always regenerate config
 generate_config
+update_world_server
 
 echo "Starting StarLoco Login Server..."
 cd /app
