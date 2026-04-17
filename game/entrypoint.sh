@@ -107,17 +107,9 @@ EOF
 generate_config
 update_world_server
 
-if [ ! -f "${SCRIPT_DIR}/Common.lua" ] || [ ! -f "/tmp/scripts_downloaded" ]; then
-    echo "Downloading all Lua scripts and maps from GitHub (this may take a while)..."
-    rm -rf /tmp/starloco-git
-    if git clone --depth 1 https://github.com/StarLoco/StarLoco-Game.git /tmp/starloco-git 2>&1; then
-        cp -r /tmp/starloco-git/scripts/* "${SCRIPT_DIR}/"
-        rm -rf /tmp/starloco-git
-        echo "Scripts downloaded successfully"
-    else
-        echo "Warning: Could not download scripts from GitHub"
-    fi
-    touch /tmp/scripts_downloaded
+if [ ! -f "${SCRIPT_DIR}/Common.lua" ]; then
+    echo "Error: Scripts not found in ${SCRIPT_DIR}. Rebuild the image with pinned scripts."
+    exit 1
 fi
 
 echo "Starting StarLoco Game Server..."

@@ -173,6 +173,16 @@ Lists available backups and restores selected one.
 
 **Warning:** Restore will stop all services and overwrite existing data.
 
+## External Dependencies
+
+| Artifact | Source | Integrity |
+|----------|--------|------------|
+| Game server JAR | GitHub releases (StarLoco-Game) | Pinned to v1.0.6 |
+| Login server JAR | GitHub releases (StarLoco-Login) | Pinned to v1.0.1 |
+| Lua scripts | StarLoco-Game scripts/ | Baked at build time (v1.0.6) |
+
+**Note:** Scripts are fetched at build time and baked into the image. No runtime git clone.
+
 ## License
 
 MIT License - Modify and distribute as you wish.
