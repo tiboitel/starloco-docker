@@ -1,16 +1,10 @@
 #!/bin/bash
 
-JAR_URL="https://github.com/StarLoco/StarLoco-Game/releases/download/v1.0.6/game.jar"
 JAR_FILE="/app/game.jar"
 CONFIG_FILE="/app/config/game.config.properties"
 
 mkdir -p /app/data /app/Logs/Error /app/Logs/General /app/config /app/scripts /app/scripts/data /app/scripts/models
 SCRIPT_DIR="/app/scripts"
-
-if [ ! -f "$JAR_FILE" ]; then
-    echo "Downloading StarLoco Game Server..."
-    curl -L -o "$JAR_FILE" "$JAR_URL"
-fi
 
 # Read secrets from Docker secrets or environment
 read_secrets() {

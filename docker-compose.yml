@@ -124,6 +124,12 @@ services:
       RATE_KAMAS: ${RATE_KAMAS:-1}
       GAME_SERVER_DEBUG: ${GAME_SERVER_DEBUG:-false}
       STARLOCO_CONFIG_PATH: /app/config/game.config.properties
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "5555"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   web:
     build:

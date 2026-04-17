@@ -1,15 +1,9 @@
 #!/bin/bash
 
-JAR_URL="https://github.com/StarLoco/StarLoco-Login/releases/download/v1.0.1/login.jar"
 JAR_FILE="/app/login.jar"
 CONFIG_FILE="/app/login.config.properties"
 
 mkdir -p /app/data
-
-if [ ! -f "$JAR_FILE" ]; then
-    echo "Downloading StarLoco Login Server..."
-    curl -L -o "$JAR_FILE" "$JAR_URL"
-fi
 
 # Read secrets from Docker secrets or environment
 read_secrets() {
