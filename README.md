@@ -110,12 +110,15 @@ The game service also waits for the login service to become healthy before start
 ### Resource Limits (Production)
 
 | Service | Memory | CPU |
-|---------|--------|-----|
-| mariadb | 512MB | 1.0 |
-| redis | 256MB | 0.5 |
-| login | 512MB | 1.0 |
-| game | 1024MB | 2.0 |
-| web | 128MB | 0.5 |
+|---------|--------|------|
+| mariadb | 1.5 GB | 1.0 |
+| redis | 256 MB | 0.25 |
+| login | 768 MB | 0.5 |
+| game | 2 GB | 2.0 |
+| web | 384 MB | 0.25 |
+
+Tuned for **performance + stability** on 8 GB RAM / 4 vCPU entry-mid VPS or laptop.
+For smaller instances, adjust values down proportionally.
 
 ## Troubleshooting
 
