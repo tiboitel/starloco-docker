@@ -12,12 +12,6 @@ services:
       - ./db-init:/docker-entrypoint-initdb.d:ro
     mem_limit: 1.5G
     cpus: 1.0
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
     logging:
       driver: json-file
       options:
@@ -51,12 +45,6 @@ services:
   game:
     mem_limit: 2G
     cpus: 2.0
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 120s
     healthcheck:
       test: ["CMD", "nc", "-z", "127.0.0.1", "5555"]
       interval: 30s
