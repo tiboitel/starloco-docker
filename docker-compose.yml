@@ -64,6 +64,10 @@ services:
     build:
       context: ./login
       dockerfile: Dockerfile
+      args:
+        STARLOCO_LOGIN_REPO: ${STARLOCO_LOGIN_REPO:-https://github.com/StarLoco/StarLoco-Login.git}
+        STARLOCO_LOGIN_REF: ${STARLOCO_LOGIN_REF:-v1.0.1}
+        STARLOCO_LOGIN_JAR: ${STARLOCO_LOGIN_JAR:-login.jar}
     container_name: login
     restart: unless-stopped
     networks:
@@ -103,6 +107,10 @@ services:
     build:
       context: ./game
       dockerfile: Dockerfile
+      args:
+        STARLOCO_GAME_REPO: ${STARLOCO_GAME_REPO:-https://github.com/StarLoco/StarLoco-Game.git}
+        STARLOCO_GAME_REF: ${STARLOCO_GAME_REF:-v1.0.6}
+        STARLOCO_GAME_JAR: ${STARLOCO_GAME_JAR:-game.jar}
     container_name: game
     restart: unless-stopped
     networks:
