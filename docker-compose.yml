@@ -15,6 +15,11 @@ services:
     restart: unless-stopped
     networks:
       - starloco
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_DATABASE: starloco_login
@@ -38,6 +43,11 @@ services:
     restart: unless-stopped
     networks:
       - starloco
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "${BIND_ADDRESS:-0.0.0.0}:6379:6379"
     environment:
@@ -58,6 +68,11 @@ services:
     restart: unless-stopped
     networks:
       - starloco
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "${BIND_ADDRESS:-0.0.0.0}:450:450"
     depends_on:
@@ -92,6 +107,11 @@ services:
     restart: unless-stopped
     networks:
       - starloco
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "${BIND_ADDRESS:-0.0.0.0}:5555:5555"
     depends_on:
@@ -139,6 +159,11 @@ services:
     restart: unless-stopped
     networks:
       - starloco
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "${BIND_ADDRESS:-0.0.0.0}:80:80"
     depends_on:
