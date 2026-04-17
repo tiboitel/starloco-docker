@@ -31,21 +31,37 @@ update_world_server() {
         return 0
     fi
 
-    echo "Updating world server metadata from environment variables..."
+    echo "Ensuring world server metadata in database..."
     SAFE_GAME_SERVER_KEY=${GAME_SERVER_KEY:-starloco}
     SAFE_GAME_SERVER_KEY=${SAFE_GAME_SERVER_KEY//\'/\'\'}
     SAFE_GAME_SERVER_NAME=${GAME_SERVER_NAME:-StarLoco}
     SAFE_GAME_SERVER_NAME=${SAFE_GAME_SERVER_NAME//\'/\'\'}
     SAFE_DB_PASSWORD=$(echo "${STARLOCO_DB_PASSWORD}" | sed "s/'/\\\\'/g")
 
-    if mariadb --skip-ssl -h "${MARIADB_HOST:-mariadb}" \
+    for attempt in 1 2 3; do
+        if mariadb --skip-ssl -h "${MARIADB_HOST:-mariadb}" \
+            -u "${STARLOCO_DB_USER:-starloco}" \
+            -p"${SAFE_DB_PASSWORD}" \
+            starloco_login \
+            -e "UPDATE world_servers SET \`key\`='${SAFE_GAME_SERVER_KEY}', name='${SAFE_GAME_SERVER_NAME}' WHERE id=${GAME_SERVER_ID:-601};"; then
+            echo "World server metadata updated (attempt $attempt)"
+            break
+        else
+            echo "Warning: Update failed (attempt $attempt/3), retrying..."
+            sleep 2
+        fi
+    done
+
+    VERIFY_KEY=$(mariadb --skip-ssl -h "${MARIADB_HOST:-mariadb}" \
         -u "${STARLOCO_DB_USER:-starloco}" \
         -p"${SAFE_DB_PASSWORD}" \
         starloco_login \
-        -e "UPDATE world_servers SET \`key\`='${SAFE_GAME_SERVER_KEY}', name='${SAFE_GAME_SERVER_NAME}' WHERE id=${GAME_SERVER_ID:-601};"; then
-        echo "World server metadata updated successfully"
+        -sN -e "SELECT \`key\` FROM world_servers WHERE id=${GAME_SERVER_ID:-601};")
+
+    if [ "${VERIFY_KEY}" = "${SAFE_GAME_SERVER_KEY}" ]; then
+        echo "World server key verified: ${VERIFY_KEY}"
     else
-        echo "Warning: Failed to update world server metadata ( continuing anyway)"
+        echo "Warning: World server key mismatch - expected '${SAFE_GAME_SERVER_KEY}', got '${VERIFY_KEY}'"
     fi
 }
 
