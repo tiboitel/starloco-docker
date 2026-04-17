@@ -3,3 +3,11 @@ AGENTS.md
 .env
 secrets
 backups
+docs/architecture.md
+docs/conventions.md
+docs/backlogs.md
+docs/entrypoints.md
+CURRENT_TASK.md
+opencode.json
+decisions.md
+docs/ai/**
