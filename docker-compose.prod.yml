@@ -73,7 +73,7 @@ services:
     mem_limit: 384M
     cpus: 0.25
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
       timeout: 10s
       retries: 3

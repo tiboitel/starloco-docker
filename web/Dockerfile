@@ -33,7 +33,6 @@ RUN set -eux; \
 
 COPY php.ini /usr/local/etc/php/php.ini
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY healthz.html /usr/local/share/nginx/html/healthz.html
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh

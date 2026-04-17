@@ -13,6 +13,7 @@ fi
 
 rm -rf "$RUNTIME_ROOT"
 cp -R "$SOURCE_ROOT" "$RUNTIME_ROOT"
+chown -R www-data:www-data "$RUNTIME_ROOT"
 
 if [ -n "$DB_PASSWORD" ]; then
     sed -i "s/define('LOGIN_DB_PASS', 'starloco_password');/define('LOGIN_DB_PASS', '$(printf %s "$DB_PASSWORD" | sed "s/'/'\\''/g")');/" "$CONFIG_FILE"

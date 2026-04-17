@@ -145,7 +145,7 @@ services:
       LOGIN_HOST: login
       GAME_HOST: game
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      test: ["CMD", "curl", "-f", "http://localhost/health.php"]
       interval: 30s
       timeout: 10s
       retries: 3
