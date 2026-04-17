@@ -1,15 +1,17 @@
 # StarLoco Docker
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Docker](https://img.shields.io/badge/Docker-20.10+-2496ED?style=flat&logo=docker)](https://www.docker.com/)
-[![Stars](https://img.shields.io/github/stars/tiboitel/starloco-docker)](https://github.com/tiboitel/starloco-docker)
-[![Last commit](https://img.shields.io/github/last-commit/tiboitel/starloco-docker)](https://github.com/tiboitel/starloco-docker)
+One-command Dofus Retro server with Docker. Community sandbox for beginners, hobbyists, and fork users.
 
-Dofus Retro private server - one command deployment.
+## What This Is
 
-## Prerequisites
+StarLoco Docker is a reproducible Dofus Retro server stack you can run locally or on a VPS. It includes login, game, database, cache, and web portal in one automated deployment.
 
-- Docker & Docker Compose
+**Why use this instead of manual setup:**
+- No manual server assembly
+- No runtime downloads from external sources
+- Secrets are auto-generated
+- Defaults are tuned for beginners
+- Optional fork overrides for advanced users
 
 ## Quick Start
 
@@ -17,33 +19,58 @@ Dofus Retro private server - one command deployment.
 ./run.sh start
 ```
 
-Secrets are auto-generated on first launch if missing.
+First run generates secrets automatically, builds Docker images, and starts all services.
 
-Server available at:
+**Ports exposed:**
 - Login: `localhost:450`
 - Game: `localhost:5555`
 - Web: `localhost:80`
 - Redis: `localhost:6379`
 
+See [Quick Start Guide](docs/quick-start.md) for full details.
+
+## Who It Is For
+
+### Beginner
+One command starts a working server. No configuration required. Just run and connect a Dofus 1.39.8 client.
+
+### Hobbyist
+Edit `.env` to change server name, IP, rates, or game version. Simple overrides without code changes.
+
+### Power User
+Use experimental fork support to swap in custom repositories, refs, or JAR files. See [Fork Support](docs/fork-support.md).
+
+## What's Included
+
+| Service | Purpose | Ports |
+|---------|---------|-------|
+| login | Authentication server | 450, 666 |
+| game | World server | 5555, 666 |
+| mariadb | Account and game database | 3306 |
+| redis | Session and cache | 6379 |
+| web | Portal and downloads | 80 |
+
+Additional features:
+- Backup and restore
+- Production mode with resource limits
+- Health checks for all services
+- JSON-structured logs
+- Experimental fork support
+
 ## Configuration
 
 ### Secrets
 
-On first launch, `./run.sh` auto-generates secrets in `secrets/` if missing:
+On first launch, `./run.sh` creates secrets in `secrets/` if missing:
+- `mariadb_root.secret` — MariaDB root password
+- `starloco_db_password.secret` — Game database password
+- `exchange_key.secret` — Server exchange key
 
-| File | Description |
-|------|-------------|
-| `mariadb_root.secret` | MariaDB root password (maintenance) |
-| `starloco_db_password.secret` | Game database user password |
-| `exchange_key.secret` | Server exchange key |
+**Important:** Copy the `secrets/` folder to any other hosts before starting there.
 
-**Important:** Copy `secrets/` to other hosts before starting there.
+### Environment Variables
 
-**Regenerate:** Delete a secret file and restart to generate a new one.
-
-### Environment
-
-Edit `.env` for custom settings:
+Edit `.env` for basic settings:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -55,12 +82,9 @@ Edit `.env` for custom settings:
 | `GAME_SERVER_VERSION` | `1.39.8` | Dofus client version |
 | `RATE_XP` | `1` | Experience multiplier |
 | `RATE_DROP` | `1` | Drop rate multiplier |
-| `RATE_DROP_THRESHOLD` | `1` | Drop threshold multiplier |
-| `RATE_KAMAS` | `1` | Kamas (currency) multiplier |
-| `RATE_JOB` | `1` | Job skill multiplier |
-| `RATE_FM` | `1` | Smithmagic (crafting) multiplier |
-| `RATE_HONOR` | `1` | Honor/PvP multiplier |
-| `GAME_SERVER_DEBUG` | `false` | Enable debug mode for troubleshooting |
+| `RATE_KAMAS` | `1` | Kamas multiplier |
+
+See the included `.env.example` for all options.
 
 ## Commands
 
@@ -68,168 +92,96 @@ Edit `.env` for custom settings:
 |---------|-------------|
 | `./run.sh start` | Start all services (default) |
 | `./run.sh start --prod` | Start with production config |
-| `./run.sh start --build` | Start with image rebuild |
+| `./run.sh start --build` | Rebuild Docker images |
 | `./run.sh stop` | Stop all services |
 | `./run.sh restart` | Restart all services |
-| `./run.sh restart --prod` | Restart with production config |
-| `./run.sh logs -f` | View all logs |
+| `./run.sh logs -f` | View logs |
 | `./run.sh logs [service]` | View specific service logs |
 | `./run.sh status` | Show service status |
-| `./run.sh backup` | Backup data to `backups/` |
+| `./run.sh backup` | Backup data |
 | `./run.sh restore` | Restore from backup |
 | `./run.sh clean` | Delete all data |
-| `./run.sh help` | Show help |
 
 ## Production Mode
 
-Production mode includes:
-
-| Feature | Description |
-|---------|-------------|
-| Resource limits | CPU and memory limits per service |
-| Health checks | Service health monitoring |
-| Log rotation | Logs limited to 10MB per file, 3 files max |
-| Restart policies | Auto-restart on failure |
-| Non-root users | Containers run as non-root (UID 1000) |
-
-**Note:** TLS for MariaDB is not yet supported (known upstream issue).
-
-`GAME_SERVER_KEY` and `GAME_SERVER_NAME` are synced into `world_servers` on game startup, so `.env` is the only file you need to edit for server identity changes.
-The game service also waits for the login service to become healthy before starting its own exchange connection.
+Production mode includes resource limits, health checks, log rotation, auto-restart, and non-root containers:
 
 ```bash
 ./run.sh start --prod
 ```
 
-### Resource Limits (Production)
-
 | Service | Memory | CPU |
-|---------|--------|------|
+|---------|--------|-----|
 | mariadb | 1.5 GB | 1.0 |
 | redis | 256 MB | 0.25 |
 | login | 768 MB | 0.5 |
 | game | 2 GB | 2.0 |
 | web | 384 MB | 0.25 |
 
-Tuned for **performance + stability** on 8 GB RAM / 4 vCPU entry-mid VPS or laptop.
-For smaller instances, adjust values down proportionally.
-
-## Troubleshooting
-
-### Services won't start
-
-```bash
-./run.sh logs -f
-```
-
-### Client connection refused
-
-1. Check firewall/port forwarding
-2. Verify `BIND_ADDRESS` in `.env` (use `0.0.0.0` for LAN/internet)
-3. Ensure services are running: `./run.sh status`
-
-### Images fail to build
-
-Force rebuild with the `--build` flag:
-```bash
-./run.sh start --build
-```
-
-### View specific service logs
-
-```bash
-./run.sh logs game
-./run.sh logs login
-./run.sh logs mariadb
-./run.sh logs redis
-./run.sh logs web
-```
-
-### Reset everything
-
-```bash
-./run.sh clean
-```
-
 ## Backup & Restore
 
-### Backup
+See [Backup and Restore Guide](docs/backup-restore.md).
 
 ```bash
 ./run.sh backup
-```
-
-Creates `backups/backup-YYYYMMDD-HHMMSS.tar.gz`
-
-**Tip:** Backups include MariaDB and Redis data volumes.
-
-### Restore
-
-```bash
 ./run.sh restore
 ```
 
-Lists available backups and restores selected one.
+**Warning:** Restore overwrites all existing data.
 
-**Warning:** Restore will stop all services and overwrite existing data.
+## Troubleshooting
 
-## External Dependencies
+See [Troubleshooting Guide](docs/troubleshooting.md).
 
-| Artifact | Source | Integrity |
-|----------|--------|------------|
-| Game server JAR | GitHub releases (StarLoco-Game) | Baked at build time (v1.0.6) |
-| Login server JAR | GitHub releases (StarLoco-Login) | Baked at build time (v1.0.1) |
-| Lua scripts | StarLoco-Game scripts/ | Baked at build time (v1.0.6) |
-
-**Note:** All artifacts are fetched at build time and baked into the images. No runtime downloads.
+Common issues:
+- Services won't start — check logs with `./run.sh logs -f`
+- Connection refused — verify firewall/port forwarding and `BIND_ADDRESS`
+- Build fails — force rebuild with `./run.sh start --build`
 
 ## Experimental Fork Support
 
-This feature is **experimental** and provided as-is. Compatibility is not guaranteed.
+StarLoco Docker supports optional fork overrides. This is experimental and compatibility is not guaranteed.
 
-### Overview
+You can override:
+- Game repository URL
+- Game ref (tag/branch/commit)
+- Game JAR filename
+- Login repository URL
+- Login ref
+- Login JAR filename
 
-You can override the default StarLoco repositories, refs, and JAR names to use a compatible fork. The Docker build will fetch artifacts from your specified sources.
-
-### Configuration
-
-Add these variables to your `.env` file:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `STARLOCO_GAME_REPO` | `https://github.com/StarLoco/StarLoco-Game.git` | Game server Git repository |
-| `STARLOCO_GAME_REF` | `v1.0.6` | Game server tag/branch/commit |
-| `STARLOCO_GAME_JAR` | `game.jar` | Game server JAR filename |
-| `STARLOCO_LOGIN_REPO` | `https://github.com/StarLoco/StarLoco-Login.git` | Login server Git repository |
-| `STARLOCO_LOGIN_REF` | `v1.0.1` | Login server tag/branch/commit |
-| `STARLOCO_LOGIN_JAR` | `login.jar` | Login server JAR filename |
-
-### Example
+Add to `.env`:
 
 ```bash
-# Use a custom fork
 STARLOCO_GAME_REPO=https://github.com/myuser/StarLoco-Game.git
 STARLOCO_GAME_REF=my-custom-branch
 STARLOCO_LOGIN_REPO=https://github.com/myuser/StarLoco-Login.git
 STARLOCO_LOGIN_REF=v1.0.2
 ```
 
-Then rebuild with:
+Then rebuild:
+
 ```bash
 ./run.sh start --build
 ```
 
-### Compatibility Requirements
-
-For a fork to work with this stack, it must:
-
+For a fork to work, it must:
 - Use the same database schema as StarLoco
-- Follow the same configuration format and environment variables
-- Expose the same ports (450/666 for login, 5555/666 for game)
-- Include Lua scripts in a `scripts/` directory at the repository root
+- Follow the same configuration format
+- Expose the same ports
+- Include Lua scripts in the repository
 
-**No support is provided** for forks that deviate from the StarLoco contract. Use at your own risk.
+See [Fork Support Guide](docs/fork-support.md) for full details.
+
+## FAQ
+
+See [FAQ](docs/faq.md).
+
+- **Can I use my own fork?** — Yes, via experimental fork overrides.
+- **Is this beginner-safe?** — Yes, defaults work out of the box with one command.
+- **How do I change my server IP?** — Edit `GAME_SERVER_IP` in `.env`.
+- **What should I edit first?** — Start with `GAME_SERVER_KEY` and `GAME_SERVER_NAME`.
 
 ## License
 
-MIT License - Modify and distribute as you wish.
+MIT License — Modify and distribute as you wish.
