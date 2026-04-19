@@ -1,15 +1,15 @@
 # StarLoco Docker
 
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Docker](https://img.shields.io/badge/Docker-20.10+-2496ED?style=flat&logo=docker)
-![Stars](https://img.shields.io/github/stars/tiboitel/starloco-docker)
-![Last commit](https://img.shields.io/github/last-commit/tiboitel/starloco-docker)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/Docker-20.10+-2496ED?style=flat&logo=docker)](https://www.docker.com/)
+[![Stars](https://img.shields.io/github/stars/tiboitel/starloco-docker)](https://github.com/tiboitel/starloco-docker)
+[![Last commit](https://img.shields.io/github/last-commit/tiboitel/starloco-docker)](https://github.com/tiboitel/starloco-docker)
 
 One-command Dofus Retro server with Docker. Community sandbox for beginners, hobbyists, and fork users.
 
-## What This Is
+## About This Project
 
-StarLoco Docker is a reproducible Dofus Retro server stack you can run locally or on a VPS. It includes login, game, database, cache, and web portal in one automated deployment.
+StarLoco Docker is a reproducible Dofus Retro server stack for local hosting, VPS deployment, and fork experimentation. It packages login, game, database, cache, and web services into one Docker-based workflow with safe defaults and no runtime downloads.
 
 **Why use this instead of manual setup:**
 - No manual server assembly
@@ -34,16 +34,19 @@ First run generates secrets automatically, builds Docker images, and starts all 
 
 See [Quick Start Guide](docs/quick-start.md) for full details.
 
-## Who It Is For
+## Usage
 
-### Beginner
-One command starts a working server. No configuration required. Just run and connect a Dofus 1.39.8 client.
+### One-Command Start
+Run `./run.sh start` to generate secrets, build images, and start the full stack.
 
-### Hobbyist
-Edit `.env` to change server name, IP, rates, or game version. Simple overrides without code changes.
+### Local Hosting
+Use the default `.env` values for a beginner-friendly local setup, then connect a Dofus 1.39.8 client.
 
-### Power User
-Use experimental fork support to swap in custom repositories, refs, or JAR files. See [Fork Support](docs/fork-support.md).
+### Server Customization
+Edit `.env` to change server IP, name, rates, and other gameplay settings without modifying code.
+
+### Fork Experimentation
+Use the experimental fork overrides to point the build at compatible custom repositories, refs, and JAR files. See [Fork Support](docs/fork-support.md).
 
 ## What's Included
 
