@@ -1,5 +1,10 @@
 # StarLoco Docker
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Docker](https://img.shields.io/badge/Docker-20.10+-2496ED?style=flat&logo=docker)
+![Stars](https://img.shields.io/github/stars/tiboitel/starloco-docker)
+![Last commit](https://img.shields.io/github/last-commit/tiboitel/starloco-docker)
+
 One-command Dofus Retro server with Docker. Community sandbox for beginners, hobbyists, and fork users.
 
 ## What This Is
