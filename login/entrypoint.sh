@@ -79,6 +79,7 @@ system.server.exchange.key ${EXCHANGE_KEY}
 system.server.login.ip 0.0.0.0
 system.server.login.port 450
 system.server.login.version ${GAME_SERVER_VERSION:-1.39.8}
+system.server.zaap.enabled=true
 
 database.login.host ${MARIADB_HOST:-mariadb}
 database.login.port 3306

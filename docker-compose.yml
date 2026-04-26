@@ -194,6 +194,44 @@ services:
       - web_runtime:/runtime
       - ./web/nginx.conf:/etc/nginx/nginx.conf:ro
 
+  zaap:
+    build:
+      context: ./zaap
+      dockerfile: Dockerfile
+      args:
+        ZAAP_REPO: ${ZAAP_REPO:-https://github.com/tiboitel/zaap.git}
+        ZAAP_REF: ${ZAAP_REF:-d2ba4204e7aee57d463a3b77fe4f98c7807fc835}
+    container_name: zaap
+    restart: unless-stopped
+    networks:
+      - starloco
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:8000:8000"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    secrets:
+      - starloco_db_password_secret
+    environment:
+      MYSQL_HOST: mariadb
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: starloco_login
+      MYSQL_USER: ${STARLOCO_DB_USER:-starloco}
+      MYSQL_PASSWORD_FILE: /run/secrets/starloco_db_password_secret
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
 volumes:
   mariadb_data:
   redis_data:

@@ -31,6 +31,7 @@ First run generates secrets automatically, builds Docker images, and starts all 
 - Game: `localhost:5555`
 - Web: `localhost:80`
 - Redis: `localhost:6379`
+- Zaap: `localhost:8000`
 
 See [Quick Start Guide](docs/quick-start.md) for full details.
 
@@ -57,6 +58,7 @@ Use the experimental fork overrides to point the build at compatible custom repo
 | mariadb | Account and game database | 3306 |
 | redis | Session and cache | 6379 |
 | web | Portal and downloads | 80 |
+| zaap | Auth API for legacy clients | 8000 |
 
 Additional features:
 - Backup and restore
@@ -73,6 +75,8 @@ On first launch, `./run.sh` creates secrets in `secrets/` if missing:
 - `mariadb_root.secret` — MariaDB root password
 - `starloco_db_password.secret` — Game database password
 - `exchange_key.secret` — Server exchange key
+
+`./run.sh clean` removes all containers, volumes, and local secrets to support secret rotation.
 
 **Important:** Copy the `secrets/` folder to any other hosts before starting there.
 
@@ -125,6 +129,7 @@ Production mode includes resource limits, health checks, log rotation, auto-rest
 | login | 768 MB | 0.5 |
 | game | 2 GB | 2.0 |
 | web | 384 MB | 0.25 |
+| zaap | 256 MB | 0.25 |
 
 ## Backup & Restore
 
@@ -157,6 +162,8 @@ You can override:
 - Login repository URL
 - Login ref
 - Login JAR filename
+- Zaap repository URL
+- Zaap ref
 
 Add to `.env`:
 
@@ -165,6 +172,8 @@ STARLOCO_GAME_REPO=https://github.com/myuser/StarLoco-Game.git
 STARLOCO_GAME_REF=my-custom-branch
 STARLOCO_LOGIN_REPO=https://github.com/myuser/StarLoco-Login.git
 STARLOCO_LOGIN_REF=v1.0.2
+ZAAP_REPO=https://github.com/myuser/zaap.git
+ZAAP_REF=my-custom-branch
 ```
 
 Then rebuild:

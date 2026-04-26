@@ -70,3 +70,17 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  zaap:
+    mem_limit: 256M
+    cpus: 0.25
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
