@@ -17,9 +17,9 @@ StarLoco Docker lets you replace the default StarLoco repositories, refs, and JA
 
 This stack is designed for StarLoco. Custom forks must be compatible:
 - Same database schema
-- Same port layout (login 450, game 5555)
+- Same port layout (login 450, game 5555, zaap 8000)
 - Same configuration format
-- Lua scripts at repository root
+- Lua scripts at repository root (game only)
 
 If your fork diverges, it won't work with this stack.
 
@@ -37,6 +37,10 @@ STARLOCO_GAME_JAR=game.jar
 STARLOCO_LOGIN_REPO=https://github.com/myuser/StarLoco-Login.git
 STARLOCO_LOGIN_REF=v1.0.1
 STARLOCO_LOGIN_JAR=login.jar
+
+# Zaap API fork
+ZAAP_REPO=https://github.com/myuser/zaap.git
+ZAAP_REF=my-custom-branch
 ```
 
 ## Variables
@@ -49,6 +53,8 @@ STARLOCO_LOGIN_JAR=login.jar
 | `STARLOCO_LOGIN_REPO` | `https://github.com/StarLoco/StarLoco-Login.git` | Login Git repository |
 | `STARLOCO_LOGIN_REF` | `v1.0.1` | Login tag/branch/commit |
 | `STARLOCO_LOGIN_JAR` | `login.jar` | Login JAR filename |
+| `ZAAP_REPO` | `https://github.com/tiboitel/zaap.git` | Zaap Git repository |
+| `ZAAP_REF` | `<commit-sha>` | Zaap tag/branch/commit |
 
 ## Build and Start
 

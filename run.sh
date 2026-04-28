@@ -125,6 +125,7 @@ show_logs() {
     echo "   - Login Server:    localhost:450"
     echo "   - Game Server:     localhost:5555"
     echo "   - Redis:           localhost:6379"
+    echo "   - Zaap API:        localhost:8000"
     echo ""
     echo " To view logs: ./run.sh logs"
     echo " To stop:      ./run.sh stop"
@@ -144,7 +145,7 @@ show_help() {
     echo "  status      Show service status"
     echo "  backup      Backup data to backups/"
     echo "  restore     Restore data from backup"
-    echo "  clean       Stop and remove all containers and volumes"
+    echo "  clean       Stop and remove all containers, volumes, and secrets"
     echo "  help        Show this help message"
     echo ""
     echo "Options:"
@@ -258,11 +259,12 @@ case "$CMD" in
         shift
         parse_flags "$@"
         check_dependencies
-        echo "WARNING: This will delete all data!"
+        echo "WARNING: This will delete all data and secrets!"
         read -p "Are you sure? (yes/no): " confirm
         if [ "$confirm" = "yes" ]; then
+            rm -f "$SCRIPT_DIR"/secrets/*.secret
             $COMPOSE_CMD $COMPOSE_FILES down -v --remove-orphans
-            echo "All data deleted."
+            echo "All data and secrets deleted."
         fi
         ;;
     backup)
