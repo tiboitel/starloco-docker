@@ -65,8 +65,8 @@ services:
       context: ./login
       dockerfile: Dockerfile
       args:
-        STARLOCO_LOGIN_REPO: ${STARLOCO_LOGIN_REPO:-https://github.com/StarLoco/StarLoco-Login.git}
-        STARLOCO_LOGIN_REF: ${STARLOCO_LOGIN_REF:-v1.0.1}
+        STARLOCO_LOGIN_REPO: ${STARLOCO_LOGIN_REPO:-https://github.com/tiboitel/StarLoco-Login.git}
+        STARLOCO_LOGIN_REF: ${STARLOCO_LOGIN_REF:-v1.0.3}
         STARLOCO_LOGIN_JAR: ${STARLOCO_LOGIN_JAR:-login.jar}
     container_name: login
     restart: unless-stopped
