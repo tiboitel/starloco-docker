@@ -58,7 +58,7 @@ Use the experimental fork overrides to point the build at compatible custom repo
 | mariadb | Account and game database | 3306 |
 | redis | Session and cache | 6379 |
 | web | Portal and downloads | 80 |
-| zaap | Auth API for legacy clients | 8000 |
+| zaap | Zaap authentication API | 8000 |
 
 Additional features:
 - Backup and restore
