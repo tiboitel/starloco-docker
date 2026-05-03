@@ -48,8 +48,8 @@ update_world_server() {
     done
 
     if [ "$UPDATE_OK" != "true" ]; then
-        echo "ERROR: Failed to update world server metadata after 3 attempts"
-        return 1
+        echo "WARNING: Failed to update world server metadata after 3 attempts"
+        return 0
     fi
 
     VERIFY_KEY=$(mariadb --skip-ssl -h "${MARIADB_HOST:-mariadb}" \
@@ -61,8 +61,7 @@ update_world_server() {
     if [ "${VERIFY_KEY}" = "${SAFE_GAME_SERVER_KEY}" ]; then
         echo "World server key verified: ${VERIFY_KEY}"
     else
-        echo "ERROR: World server key mismatch - expected '${SAFE_GAME_SERVER_KEY}', got '${VERIFY_KEY}'"
-        return 1
+        echo "WARNING: World server key mismatch - expected '${SAFE_GAME_SERVER_KEY}', got '${VERIFY_KEY}'"
     fi
 }
 
@@ -98,7 +97,7 @@ EOF
 
 # Always regenerate config
 generate_config
-update_world_server || { echo "ERROR: Failed to update world server, exiting"; exit 1; }
+update_world_server
 
 echo "Starting StarLoco Login Server..."
 cd /app

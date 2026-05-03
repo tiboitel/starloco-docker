@@ -10247,9 +10247,9 @@ CREATE TABLE `world_accounts`  (
 -- ----------------------------
 -- Records of world_accounts
 -- ----------------------------
-INSERT INTO `world_accounts` VALUES (1, 'test', 'ff594f8cf10ca2e3ad4279375f0d0e688a7eca861000e7ecc63ae4b105c8be7bcb57e8c1172ea460c462c6f715508dc356fd964cf41644682db1feffd466769a', 0, NULL, '127.0.0.1', '2023~04~27~09~31', 0, 'supprimer ?', 'oui', 'dofus', 0, 0, 1, '', '', 0, 1, 0, 0, NULL, '', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0);
-INSERT INTO `world_accounts` VALUES (2, 'test2', 'ff594f8cf10ca2e3ad4279375f0d0e688a7eca861000e7ecc63ae4b105c8be7bcb57e8c1172ea460c462c6f715508dc356fd964cf41644682db1feffd466769a', 0, NULL, NULL, NULL, 0, 'supprimer ?', 'oui', 'dofus1', 0, 0, 1, NULL, NULL, 0, 1, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0);
-INSERT INTO `world_accounts` VALUES (3, 'test3', 'ff594f8cf10ca2e3ad4279375f0d0e688a7eca861000e7ecc63ae4b105c8be7bcb57e8c1172ea460c462c6f715508dc356fd964cf41644682db1feffd466769a', 0, NULL, NULL, NULL, 0, 'supprimer ?', 'oui', 'dofus2', 0, 0, 1, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0);
+INSERT INTO `world_accounts` VALUES (1, 'test', 'ff594f8cf10ca2e3ad4279375f0d0e688a7eca861000e7ecc63ae4b105c8be7bcb57e8c1172ea460c462c6f715508dc356fd964cf41644682db1feffd466769a', 0, NULL, '127.0.0.1', '2023~04~27~09~31', 0, 'supprimer ?', 'oui', 'dofus', 0, 0, 1, '', '', 0, 1, 0, 0, NULL, '', NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL);
+INSERT INTO `world_accounts` VALUES (2, 'test2', 'ff594f8cf10ca2e3ad4279375f0d0e688a7eca861000e7ecc63ae4b105c8be7bcb57e8c1172ea460c462c6f715508dc356fd964cf41644682db1feffd466769a', 0, NULL, NULL, NULL, 0, 'supprimer ?', 'oui', 'dofus1', 0, 0, 1, NULL, NULL, 0, 1, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL);
+INSERT INTO `world_accounts` VALUES (3, 'test3', 'ff594f8cf10ca2e3ad4279375f0d0e688a7eca861000e7ecc63ae4b105c8be7bcb57e8c1172ea460c462c6f715508dc356fd964cf41644682db1feffd466769a', 0, NULL, NULL, NULL, 0, 'supprimer ?', 'oui', 'dofus2', 0, 0, 1, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, 0, NULL);
 
 -- ----------------------------
 -- Table structure for world_base_areas
